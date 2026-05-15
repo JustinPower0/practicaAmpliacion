@@ -3,9 +3,9 @@ $host = 'localhost';
 $user = 'phpuser';
 $pass = 'password123';
 $db   = 'practica';
-
+   
 $conn = new mysqli($host, $user, $pass, $db);
-
+     
 if ($conn->connect_error) {
     die("<p>Error de connexió: " . $conn->connect_error . "</p>");
 }
@@ -28,5 +28,5 @@ if ($conn->connect_error) {
     <p class="ok">✅ PHP funcionant</p>
     <p class="ok">✅ Connexió MySQL: <strong>OK</strong></p>
     <p><small>Desplegat automàticament amb GitHub Actions</small></p>
-</body>
-</html>
+</body>   
+</html>  
