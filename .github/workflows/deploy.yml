@@ -1,0 +1,19 @@
+name: Deploy a IsardVDI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout del codi
+        uses: actions/checkout@v3
+
+      - name: Copiar fitxers al servidor web
+        run: |
+          sudo cp -r * /var/www/html/practica/
+          sudo systemctl restart apache2
