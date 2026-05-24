@@ -7,13 +7,22 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout del codi
         uses: actions/checkout@v3
 
-      - name: Copiar fitxers al servidor web
+      - name: Configurar clau SSH
         run: |
-          sudo cp -r * /var/www/html/practica/
-          sudo systemctl restart apache2
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Copiar fitxers al servidor
+        run: |
+          scp -P 443 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r ./* d7cc96b5-d30c-430b-9a2f-17373df7f7ec@bastion.elmeuescriptori.cat:/var/www/html/practica/
+
+      - name: Reiniciar Apache
+        run: |
+          ssh -p 443 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no d7cc96b5-d30c-430b-9a2f-17373df7f7ec@bastion.elmeuescriptori.cat "sudo systemctl restart apache2"
