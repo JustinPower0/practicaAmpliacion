@@ -13,20 +13,13 @@ jobs:
       - name: Checkout del codi
         uses: actions/checkout@v3
 
-      - name: Configurar clau SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Crear carpeta destino
-        run: |
-          ssh -p ${{ secrets.SSH_PORT }} -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /home/${{ secrets.REMOTE_USER }}/practica"
+      - name: Instalar sshpass
+        run: sudo apt-get install -y sshpass
 
       - name: Copiar fitxers al servidor
         run: |
-          scp -P ${{ secrets.SSH_PORT }} -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r ./* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.REMOTE_USER }}/practica/
+          sshpass -p "${{ secrets.REMOTE_PASS }}" scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no -r ./* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.REMOTE_USER }}/practica/
 
-      - name: Moure fitxers i reiniciar Apache
+      - name: Reiniciar Apache
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo mkdir -p /var/www/html/practica && sudo cp -r /home/${{ secrets.REMOTE_USER }}/practica/* /var/www/html/practica/ && sudo systemctl restart apache2"
+          sshpass -p "${{ secrets.REMOTE_PASS }}" ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo mkdir -p /var/www/html/practica && sudo cp -r /home/${{ secrets.REMOTE_USER }}/practica/* /var/www/html/practica/ && sudo systemctl restart apache2"
